@@ -114,6 +114,8 @@ def extract_login_domain(address: str) -> tuple[str, str]:
 
 # Часть B. Отправка письма
 
+# Часть B. Отправка письма
+
 def sender_email(recipient_list: list[str], subject: str, message: str, *, sender="default@study.com") -> list[dict]:
     # 1. Проверить, что recipient_list не пустой
     if not recipient_list:
@@ -148,13 +150,14 @@ def sender_email(recipient_list: list[str], subject: str, message: str, *, sende
 
         # 8. Замаскировать email отправителя
         login, domain = extract_login_domain(normalized_sender)
-        email_dict['masked_sender'] = mask_sender_email(login, domain)
+        masked_sender = mask_sender_email(login, domain)
+        email_dict['masked_sender'] = masked_sender
 
         # 9. Сохранить короткую версию
         email_dict = add_short_body(email_dict)
 
-        # 10. Сформировать итоговый текст письма
-        email_dict['sent_text'] = build_sent_text(email_dict)
+        # 10. Сформировать итоговый текст письма с использованием замаскированного отправителя и короткой версии тела
+        email_dict['sent_text'] = f"Кому: {email_dict.get('recipient', '')}, от {masked_sender}\nТема: {email_dict.get('subject', '')}, дата {email_dict.get('date', '')}\n{email_dict.get('short_body', '')}"
 
         sent_emails.append(email_dict)
 
